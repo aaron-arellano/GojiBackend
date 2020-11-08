@@ -15,7 +15,7 @@ import java.util.logging.Logger;
 /** Test class to ensure non-regression of data access methods
  *
  *  @author Aaron
- *  @version 2020.10.26
+ *  @version 2020.11.07
  */
 public class MySqlClientTest {
     private MySqlClient mySqlClient;
