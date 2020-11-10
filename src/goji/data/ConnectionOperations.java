@@ -1,5 +1,6 @@
 package goji.data;
 
+import goji.common.GojiLogManagement;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -10,41 +11,42 @@ import java.util.logging.Logger;
 /** Houses common connection operations done on a database in this project
  *
  *  @author Aaron
- *  @version Oct 27, 2020
+ *  @version 2020.11.09
  */
 public class ConnectionOperations {
-    private DatabaseConfigWrapper dbConfig;
 
-    /** Create a new ConnectionOperations object with a set access level of default
-     *  to only allow classes in this package to create new ConnectionOperations
-     *  objects.
+    private static final Logger LOGGER = GojiLogManagement.createLogger(ConnectionOperations.class.getName());
+
+    /** Default constructor
      *
-     * @param dbConfig the MySql db configuration needed to create a connection
      */
-    ConnectionOperations(DatabaseConfigWrapper dbConfig) {
-        this.dbConfig = dbConfig;
+    ConnectionOperations() {
+        //
     }
 
     /** Creates a connection to the requested MySql DB
      *
-     * @param logger the Logger passed in by requesting class
+     * @param dbConfig configuration used to connect to database
+     *
      * @return the connection to the MySql DB
      */
-    Connection connectToDb(Logger logger) {
+    static Connection connectToDbAccount(DatabaseConfigWrapper dbConfig) {
         Connection result = null;
         try {
             //register JDBC driver
             Class.forName(dbConfig.getJdbcDriver());
 
             //open a connection
-            logger.info("Connecting to database...");
+            LOGGER.info("Connecting to database...");
             result = DriverManager.getConnection(dbConfig.getMysqlUrl(), dbConfig.getUsername(), dbConfig.getPassword());
+
+            LOGGER.info("Setting default database to: " + dbConfig.getDatabaseName());
         }
         catch(SQLException se) {
-            logger.warning("There is no error... " + se.toString());
+            LOGGER.warning("There is no error... " + se.toString());
         }
         catch(Exception e) {
-            logger.severe(e.toString());
+            LOGGER.severe(e.toString());
         }
 
         return result;
@@ -55,35 +57,34 @@ public class ConnectionOperations {
      * @param conn the connection to close
      * @param stmt the SQL statement to close
      * @param rs the ResultSet that will be closed
-     * @param logger the Logger passed in by requesting class
      */
-    void closeDbConnection(Connection conn, Statement stmt, ResultSet rs, Logger logger) {
+    static void closeDbConnections(Connection conn, Statement stmt, ResultSet rs) {
         try {
             if(rs != null) {
                 rs.close();
-                logger.info("ResultSet closed successfully...");
+                LOGGER.info("ResultSet closed successfully...");
             }
         }
         catch(SQLException se2) {
-            logger.warning(se2.toString());
+            LOGGER.warning(se2.toString());
         }
         try {
             if(stmt != null) {
                 stmt.close();
-                logger.info("SQL statement closed successfully...");
+                LOGGER.info("SQL statement closed successfully...");
             }
         }
         catch(SQLException se2) {
-            logger.warning(se2.toString());
+            LOGGER.warning(se2.toString());
         }
         try {
             if(conn != null) {
                 conn.close();
-                logger.info("Connection to db closed successfully...");
+                LOGGER.info("Connection to db closed successfully...");
             }
         }
         catch(SQLException se) {
-            logger.warning(se.toString());
+            LOGGER.warning(se.toString());
         }
     }
 

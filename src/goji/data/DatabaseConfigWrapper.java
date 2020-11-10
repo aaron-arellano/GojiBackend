@@ -54,14 +54,12 @@ public class DatabaseConfigWrapper {
     }
 
     @SuppressWarnings("javadoc")
-    public String getDatabaseName()
-    {
+    public String getDatabaseName() {
         return databaseName;
     }
 
     @SuppressWarnings("javadoc")
-    public void setDatabaseName(String databaseName)
-    {
+    public void setDatabaseName(String databaseName) {
         this.databaseName = databaseName;
     }
 

@@ -65,8 +65,7 @@ public class TaskEntry {
     }
 
     @SuppressWarnings("javadoc")
-    public void setTaskEntryKind(TaskEntryKind taskEntryKind)
-    {
+    public void setTaskEntryKind(TaskEntryKind taskEntryKind) {
         this.taskEntryKind = taskEntryKind;
     }
 }
