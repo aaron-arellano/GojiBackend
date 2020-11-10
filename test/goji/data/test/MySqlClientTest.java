@@ -1,6 +1,7 @@
 package goji.data.test;
 
 import static org.junit.Assert.*;
+import common.SetupTestEnv;
 import common.TestDatabaseConfigLoader;
 import org.junit.After;
 import org.junit.Before;
@@ -18,36 +19,36 @@ import java.util.logging.Logger;
  *  @version 2020.11.07
  */
 public class MySqlClientTest {
-    private MySqlClient mySqlClient;
-    private DatabaseConfigWrapper wrapper;
     private static final Logger LOGGER = GojiLogManagement.createLogger("Test");
+    private SqlClient mySqlClient;
+    private DatabaseConfigWrapper wrapper;
+
 
     @SuppressWarnings("javadoc")
     @Before
     public void setUp() throws Exception {
-        wrapper = TestDatabaseConfigLoader.createTestDbConfig();
-        this.mySqlClient = new MySqlClient(wrapper);
+        this.wrapper = TestDatabaseConfigLoader.createTestDbConfig();
+        this.mySqlClient = SetupTestEnv.createTestClient(wrapper);
     }
 
     @SuppressWarnings("javadoc")
     @After
     public void tearDown() {
-        this.mySqlClient.closeConnection(LOGGER);
+        this.mySqlClient.closeConnection();
     }
 
     @SuppressWarnings("javadoc")
     @Test
     public void createDeleteDbTest() {
-        wrapper.setDatabaseName("createDelete");
-        MySqlClient createDeleteClient = new MySqlClient(wrapper);
+        SqlClient createDeleteClient = new MySqlClient(wrapper);
         // "exampleDB"
-        boolean created = createDeleteClient.createDB();
+        boolean created = createDeleteClient.setDefaultDatabaseCreateIfNotExists("exampleDB");
+
         assertTrue(created);
 
-        boolean deleted = createDeleteClient.deleteDB();
-        assertTrue(deleted);
+        createDeleteClient.deleteDb("exampleDB");
 
-        createDeleteClient.closeConnection(LOGGER);
+        createDeleteClient.closeConnection();
     }
 
 
@@ -71,7 +72,7 @@ public class MySqlClientTest {
             LOGGER.warning(se.toString());
         }
         finally {
-            mySqlClient.closeStatementResultSet(stmt, result, LOGGER);
+            mySqlClient.closeStatementResultSet(stmt, result);
         }
 
         assertEquals("test", actual);

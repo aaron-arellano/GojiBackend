@@ -31,7 +31,7 @@ public class TaskDbSchema {
             public static final String DATE = "entry_date";
             public static final String KIND = "entry_kind";
             public static final String ENTRYID = "entry_uuid";
-            public static final String UUID = "task_uuid";
+            public static final String TASKUUID = "task_uuid";
         }
     }
 }

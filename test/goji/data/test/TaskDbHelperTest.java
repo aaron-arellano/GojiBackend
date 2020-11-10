@@ -1,7 +1,7 @@
 package goji.data.test;
 
 import goji.common.GojiLogManagement;
-import goji.data.MySqlClient;
+import goji.data.SqlClient;
 import goji.data.TaskDbHelper;
 import java.sql.*;
 import java.sql.SQLException;
@@ -10,30 +10,31 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;
+import common.SetupTestEnv;
 import common.TestDatabaseConfigLoader;
 
 /** Tests functionality of TaskDbHelper class
  *
  *  @author Aaron
- *  @version 2020.10.23
+ *  @version 2020.11.09
  */
 public class TaskDbHelperTest {
 
-    private TaskDbHelper taskDbHelper;
-    private MySqlClient mySqlClient;
     private static final Logger LOGGER = GojiLogManagement.createLogger("Test");
+    private TaskDbHelper taskDbHelper;
+    private SqlClient mySqlClient;
 
     @SuppressWarnings("javadoc")
     @Before
     public void setUp() throws Exception {
-        this.mySqlClient = new MySqlClient(TestDatabaseConfigLoader.createTestDbConfig());
+        this.mySqlClient = SetupTestEnv.createTestClient(TestDatabaseConfigLoader.createTestDbConfig());
         this.taskDbHelper = new TaskDbHelper(this.mySqlClient);
     }
 
     @SuppressWarnings("javadoc")
     @After
     public void tearDown() {
-        mySqlClient.closeConnection(LOGGER);
+        mySqlClient.closeConnection();
     }
 
     @SuppressWarnings("javadoc")
@@ -56,7 +57,7 @@ public class TaskDbHelperTest {
             LOGGER.warning(se.toString());
         }
         finally {
-            mySqlClient.closeStatementResultSet(stmt, result, LOGGER);
+            mySqlClient.closeStatementResultSet(stmt, result);
         }
 
         assertEquals("2", actual);
@@ -77,7 +78,7 @@ public class TaskDbHelperTest {
             LOGGER.warning(se.toString());
         }
         finally {
-            mySqlClient.closeStatementResultSet(stmt, result, LOGGER);
+            mySqlClient.closeStatementResultSet(stmt, result);
         }
 
         assertEquals("task", tableNames[0]);

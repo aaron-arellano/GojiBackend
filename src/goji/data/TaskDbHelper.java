@@ -13,15 +13,15 @@ import java.util.logging.Logger;
  *  @author Aaron
  *  @version 2020.10.31
  */
-public class TaskDbHelper {
+public class TaskDbHelper implements IDbHelper {
     private static final Logger LOGGER = GojiLogManagement.createLogger(TaskDbHelper.class.getName());
-    private MySqlClient mySqlClient;
+    private SqlClient mySqlClient;
 
     /** Create a new TaskDbHelper object.
      *
      * @param mySqlClient
      */
-    public TaskDbHelper(MySqlClient mySqlClient) {
+    public TaskDbHelper(SqlClient mySqlClient) {
         this.mySqlClient = mySqlClient;
     }
 
@@ -55,8 +55,8 @@ public class TaskDbHelper {
             + "{5} VARCHAR(30) NOT NULL UNIQUE, "
             + "FOREIGN KEY ({6}) REFERENCES {7} ({8}) )",
             TaskEntryTable.NAME, TaskEntryTable.Cols.TEXT, TaskEntryTable.Cols.DATE,
-            TaskEntryTable.Cols.KIND, TaskEntryTable.Cols.ENTRYID, TaskEntryTable.Cols.UUID,
-            TaskEntryTable.Cols.UUID, TaskTable.NAME, TaskTable.Cols.UUID);
+            TaskEntryTable.Cols.KIND, TaskEntryTable.Cols.ENTRYID, TaskEntryTable.Cols.TASKUUID,
+            TaskEntryTable.Cols.TASKUUID, TaskTable.NAME, TaskTable.Cols.UUID);
 
         mySqlClient.updateDatabaseStatement(stmt);
         LOGGER.info("Table exists: " + TaskEntryTable.NAME);

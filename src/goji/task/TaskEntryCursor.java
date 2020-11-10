@@ -2,7 +2,7 @@ package goji.task;
 
 import goji.common.GojiLogManagement;
 import goji.common.utils.StringUtils;
-import goji.data.MySqlClient;
+import goji.data.SqlClient;
 import goji.data.TaskDbSchema.TaskEntryTable;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -22,13 +22,13 @@ import java.util.logging.Logger;
 public class TaskEntryCursor implements ITaskEntryCursor{
     private static final Logger LOGGER =
         GojiLogManagement.createLogger(TaskEntryCursor.class.getName());
-    private MySqlClient mySqlClient;
+    private SqlClient mySqlClient;
 
     /** Construct a TaskEntryCursor object
      *
      * @param mySqlClient the Client we run SQL operations on
      */
-    TaskEntryCursor(MySqlClient mySqlClient) {
+    TaskEntryCursor(SqlClient mySqlClient) {
         this.mySqlClient = mySqlClient;
     }
 
@@ -60,7 +60,7 @@ public class TaskEntryCursor implements ITaskEntryCursor{
             LOGGER.warning(se.toString());
         }
         finally {
-            mySqlClient.closeStatementResultSet(stmt, null, LOGGER);
+            mySqlClient.closeStatementResultSet(stmt, null);
         }
 
         LOGGER.info("TasEntry added to the database...");
@@ -100,7 +100,7 @@ public class TaskEntryCursor implements ITaskEntryCursor{
             LOGGER.warning(se.toString());
         }
         finally {
-            mySqlClient.closeStatementResultSet(stmt, null, LOGGER);
+            mySqlClient.closeStatementResultSet(stmt, null);
         }
 
         LOGGER.info("TaskEntry updated in database...");
@@ -122,7 +122,7 @@ public class TaskEntryCursor implements ITaskEntryCursor{
                 "WHERE {1} = {2}" +
                 "ORDER BY id ASC",
                 TaskEntryTable.NAME,
-                TaskEntryTable.Cols.ENTRYID,
+                TaskEntryTable.Cols.TASKUUID,
                 taskId);
         ResultSet result = mySqlClient
             .queryDatabaseStatement(query);
@@ -148,7 +148,7 @@ public class TaskEntryCursor implements ITaskEntryCursor{
             LOGGER.warning(se.toString());
         }
         finally {
-            mySqlClient.closeStatementResultSet(stmt, result, LOGGER);
+            mySqlClient.closeStatementResultSet(stmt, result);
         }
 
         return taskEntries;

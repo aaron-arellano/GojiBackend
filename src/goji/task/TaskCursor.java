@@ -3,7 +3,7 @@ package goji.task;
 import goji.common.GojiLogManagement;
 import goji.common.utils.StringUtils;
 import goji.data.TaskDbSchema.TaskTable;
-import goji.data.MySqlClient;
+import goji.data.SqlClient;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -22,7 +22,7 @@ import java.util.logging.Logger;
 public class TaskCursor implements ITaskCursor {
     private static final Logger LOGGER =
         GojiLogManagement.createLogger(TaskCursor.class.getName());
-    private MySqlClient mySqlClient;
+    private SqlClient mySqlClient;
     private TaskEntryCursor taskEntryCursor;
 
 
@@ -31,7 +31,7 @@ public class TaskCursor implements ITaskCursor {
      * @param taskEntryCursor the correlated TaskEntryCursor to run operations on
      *
      */
-    TaskCursor(MySqlClient mySqlClient, TaskEntryCursor taskEntryCursor) {
+    TaskCursor(SqlClient mySqlClient, TaskEntryCursor taskEntryCursor) {
         this.mySqlClient = mySqlClient;
         this.taskEntryCursor = taskEntryCursor;
     }
@@ -71,7 +71,7 @@ public class TaskCursor implements ITaskCursor {
             LOGGER.warning(se.toString());
         }
         finally {
-            mySqlClient.closeStatementResultSet(stmt, result, LOGGER);
+            mySqlClient.closeStatementResultSet(stmt, result);
         }
 
         LOGGER.info(
@@ -131,7 +131,7 @@ public class TaskCursor implements ITaskCursor {
             LOGGER.warning(se.toString());
         }
         finally {
-            mySqlClient.closeStatementResultSet(stmt, result, LOGGER);
+            mySqlClient.closeStatementResultSet(stmt, result);
         }
 
         return taskList;
@@ -167,7 +167,7 @@ public class TaskCursor implements ITaskCursor {
             LOGGER.warning(se.toString());
         }
         finally {
-            mySqlClient.closeStatementResultSet(stmt, null, LOGGER);
+            mySqlClient.closeStatementResultSet(stmt, null);
         }
 
         for (TaskEntry entry: task.getTaskEntries()) {
@@ -229,7 +229,7 @@ public class TaskCursor implements ITaskCursor {
             LOGGER.warning(se.toString());
         }
         finally {
-            mySqlClient.closeStatementResultSet(stmt, null, LOGGER);
+            mySqlClient.closeStatementResultSet(stmt, null);
         }
 
         LOGGER.info("Task updated in database...");
