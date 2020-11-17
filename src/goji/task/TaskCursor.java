@@ -146,20 +146,26 @@ public class TaskCursor implements ITaskCursor {
         LOGGER.info("Adding Task with uuid: " + task.getId().toString());
 
         String insert = StringUtils.applyFormat(
-            "INSERT INTO {0} " + "VALUES(?,?,?,?,?,?)",
-            TaskTable.NAME);
+            "INSERT INTO {0} ({1}, {2}, {3}, {4}, {5}, {6}) " + "VALUES(?,?,?,?,?,?)",
+            TaskTable.NAME,
+            TaskTable.Cols.UUID,
+            TaskTable.Cols.TITLE,
+            TaskTable.Cols.DATE,
+            TaskTable.Cols.DEFERRED,
+            TaskTable.Cols.REALIZED,
+            TaskTable.Cols.PHOTOPATH);
 
         // add the Task
         PreparedStatement stmt = null;
         try {
 
             stmt = mySqlClient.getPreparedStatement(insert);
-            stmt.setString(0, task.getId().toString());
-            stmt.setString(1, task.getTitle());
-            stmt.setLong(2, task.getRevealedDate().getTime());
-            stmt.setInt(3, task.isDeferred() ? 1 : 0);
-            stmt.setInt(4, task.isRealized() ? 1 : 0);
-            stmt.setString(5, task.getPhotoFilename());
+            stmt.setString(1, task.getId().toString());
+            stmt.setString(2, task.getTitle());
+            stmt.setLong(3, task.getRevealedDate().getTime());
+            stmt.setInt(4, task.isDeferred() ? 1 : 0);
+            stmt.setInt(5, task.isRealized() ? 1 : 0);
+            stmt.setString(6, task.getPhotoFilePath());
 
             stmt.executeUpdate();
         }
@@ -220,7 +226,7 @@ public class TaskCursor implements ITaskCursor {
             stmt.setString(1, task.getTitle());
             stmt.setInt(2, task.isDeferred() ? 1 : 0);
             stmt.setInt(3, task.isRealized() ? 1 : 0);
-            stmt.setString(4, task.getPhotoFilename());
+            stmt.setString(4, task.getPhotoFilePath());
             stmt.setString(5, task.getId().toString());
 
             stmt.executeUpdate();

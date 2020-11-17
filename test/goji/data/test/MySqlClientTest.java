@@ -33,7 +33,7 @@ public class MySqlClientTest {
 
     @SuppressWarnings("javadoc")
     @After
-    public void tearDown() {
+    public void tearDown() throws Exception {
         this.mySqlClient.closeConnection();
     }
 

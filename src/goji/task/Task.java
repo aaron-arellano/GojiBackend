@@ -15,6 +15,7 @@ public class Task {
     private Date taskCheckboxDate;
     private boolean taskRealized;
     private boolean taskDeferred;
+    private String photoFilePath;
     private List<TaskEntry> taskEntries;
 
     /** Create a new Task object.
@@ -104,8 +105,13 @@ public class Task {
     }
 
     @SuppressWarnings("javadoc")
-    public String getPhotoFilename() {
-        return "IMG_" + getId().toString() + ".jpg";
+    public String getPhotoFilePath() {
+        return photoFilePath;
+    }
+
+    @SuppressWarnings("javadoc")
+    public String setPhotoFilePath(String photoFilePath) {
+        return this.photoFilePath = photoFilePath;
     }
 
     /** Adds new revealed entry to a TaskEntry

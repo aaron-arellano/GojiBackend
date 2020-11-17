@@ -33,9 +33,9 @@ public class TaskDbHelper implements IDbHelper {
         LOGGER.info("Creating table: " + TaskTable.NAME);
         String stmt = StringUtils.applyFormat("CREATE TABLE IF NOT EXISTS {0} ( "
             + "id INT AUTO_INCREMENT PRIMARY KEY, "
-            + "{1} VARCHAR(30) NOT NULL UNIQUE, "
-            + "{2} VARCHAR(20), "
-            + "{3} DATE, "
+            + "{1} VARCHAR(50) NOT NULL UNIQUE, "
+            + "{2} VARCHAR(50), "
+            + "{3} LONG, "
             + "{4} INT, "
             + "{5} INT, "
             + "{6} VARCHAR(100) )",
@@ -48,11 +48,11 @@ public class TaskDbHelper implements IDbHelper {
         LOGGER.info("Creating table: " + TaskEntryTable.NAME);
         stmt = StringUtils.applyFormat("CREATE TABLE IF NOT EXISTS {0} ( "
             + "id INT AUTO_INCREMENT PRIMARY KEY, "
-            + "{1} VARCHAR(300), "
-            + "{2} DATE, "
+            + "{1} VARCHAR(500), "
+            + "{2} LONG, "
             + "{3} VARCHAR(30), "
-            + "{4} VARCHAR(30) NOT NULL UNIQUE, "
-            + "{5} VARCHAR(30) NOT NULL UNIQUE, "
+            + "{4} VARCHAR(50) NOT NULL UNIQUE, "
+            + "{5} VARCHAR(50) NOT NULL UNIQUE, "
             + "FOREIGN KEY ({6}) REFERENCES {7} ({8}) )",
             TaskEntryTable.NAME, TaskEntryTable.Cols.TEXT, TaskEntryTable.Cols.DATE,
             TaskEntryTable.Cols.KIND, TaskEntryTable.Cols.ENTRYID, TaskEntryTable.Cols.TASKUUID,

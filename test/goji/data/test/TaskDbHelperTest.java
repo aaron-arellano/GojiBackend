@@ -33,7 +33,7 @@ public class TaskDbHelperTest {
 
     @SuppressWarnings("javadoc")
     @After
-    public void tearDown() {
+    public void tearDown() throws Exception {
         mySqlClient.closeConnection();
     }
 
