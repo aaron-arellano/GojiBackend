@@ -12,9 +12,9 @@ public class Task {
     private UUID taskID;
     private String taskTitle;
     private Date taskRevealedDate;
-    private Date taskCheckboxDate;
     private boolean taskRealized;
     private boolean taskDeferred;
+    private String photoFilePath;
     private List<TaskEntry> taskEntries;
 
     /** Create a new Task object.
@@ -94,18 +94,13 @@ public class Task {
     }
 
     @SuppressWarnings("javadoc")
-    public Date getCheckboxDate() {
-        return taskCheckboxDate;
+    public String getPhotoFilePath() {
+        return photoFilePath;
     }
 
     @SuppressWarnings("javadoc")
-    public void setCheckboxDate(Date taskCheckboxDate) {
-        this.taskCheckboxDate = taskCheckboxDate;
-    }
-
-    @SuppressWarnings("javadoc")
-    public String getPhotoFilename() {
-        return "IMG_" + getId().toString() + ".jpg";
+    public String setPhotoFilePath(String photoFilePath) {
+        return this.photoFilePath = photoFilePath;
     }
 
     /** Adds new revealed entry to a TaskEntry

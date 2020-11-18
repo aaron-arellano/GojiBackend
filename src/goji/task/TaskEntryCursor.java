@@ -28,7 +28,7 @@ public class TaskEntryCursor implements ITaskEntryCursor{
      *
      * @param mySqlClient the Client we run SQL operations on
      */
-    TaskEntryCursor(SqlClient mySqlClient) {
+    public TaskEntryCursor(SqlClient mySqlClient) {
         this.mySqlClient = mySqlClient;
     }
 
@@ -41,18 +41,23 @@ public class TaskEntryCursor implements ITaskEntryCursor{
         LOGGER.info("Adding TaskEntry with uuid: " + taskEntry.getTaskEntryID().toString());
 
         String insert = StringUtils.applyFormat(
-            "INSERT INTO {0} " + "VALUES(?,?,?,?,?)",
-            TaskEntryTable.NAME);
+            "INSERT INTO {0} ({1}, {2}, {3}, {4}, {5})" + "VALUES(?,?,?,?,?)",
+            TaskEntryTable.NAME,
+            TaskEntryTable.Cols.TEXT,
+            TaskEntryTable.Cols.DATE,
+            TaskEntryTable.Cols.KIND,
+            TaskEntryTable.Cols.ENTRYID,
+            TaskEntryTable.Cols.TASKUUID);
 
         // add the TaskEntry
         PreparedStatement stmt = null;
         try {
             stmt = mySqlClient.getPreparedStatement(insert);
-            stmt.setString(0, taskEntry.getEntryText());
-            stmt.setLong(1, taskEntry.getEntryDate().getTime());
-            stmt.setString(2, taskEntry.getTaskEntryKind().name());
-            stmt.setString(3, taskEntry.getTaskEntryID().toString());
-            stmt.setString(4, task.getId().toString());
+            stmt.setString(1, taskEntry.getEntryText());
+            stmt.setLong(2, taskEntry.getEntryDate().getTime());
+            stmt.setString(3, taskEntry.getTaskEntryKind().name());
+            stmt.setString(4, taskEntry.getTaskEntryID().toString());
+            stmt.setString(5, task.getId().toString());
 
             stmt.executeUpdate();
         }
@@ -63,7 +68,7 @@ public class TaskEntryCursor implements ITaskEntryCursor{
             mySqlClient.closeStatementResultSet(stmt, null);
         }
 
-        LOGGER.info("TasEntry added to the database...");
+        LOGGER.info("TaskEntry added to the database...");
     }
 
 
@@ -87,12 +92,11 @@ public class TaskEntryCursor implements ITaskEntryCursor{
         // update the Task
         PreparedStatement stmt = null;
         try {
-            // TODO
             stmt = mySqlClient.getPreparedStatement(insert);
-            stmt.setString(0, taskEntry.getEntryText().toString());
-            stmt.setLong(1, taskEntry.getEntryDate().getTime());
-            stmt.setString(2, taskEntry.getTaskEntryKind().name());
-            stmt.setString(3, taskEntry.getTaskEntryID().toString());
+            stmt.setString(1, taskEntry.getEntryText().toString());
+            stmt.setLong(2, taskEntry.getEntryDate().getTime());
+            stmt.setString(3, taskEntry.getTaskEntryKind().name());
+            stmt.setString(4, taskEntry.getTaskEntryID().toString());
 
             stmt.executeUpdate();
         }
@@ -118,9 +122,9 @@ public class TaskEntryCursor implements ITaskEntryCursor{
         LOGGER.info("Querying all TaskEntries for Task with uuid: " + taskId);
         String query =
             StringUtils.applyFormat(
-                "SELECT * FROM {0}" +
-                "WHERE {1} = {2}" +
-                "ORDER BY id ASC",
+                "SELECT * FROM {0} " +
+                "WHERE {1} = \"{2}\" " +
+                "ORDER BY id ASC ",
                 TaskEntryTable.NAME,
                 TaskEntryTable.Cols.TASKUUID,
                 taskId);

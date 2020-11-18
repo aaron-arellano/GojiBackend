@@ -33,14 +33,14 @@ public class TaskDbHelperTest {
 
     @SuppressWarnings("javadoc")
     @After
-    public void tearDown() {
+    public void tearDown() throws Exception {
         mySqlClient.closeConnection();
     }
 
     @SuppressWarnings("javadoc")
     @Test
-    public void createDbCreateTableTest() {
-        taskDbHelper.createDbCreateTable();
+    public void createDbTableTest() {
+        taskDbHelper.createDbTable();
 
         String query = "SELECT COUNT(table_name) FROM information_schema.tables WHERE table_schema='test'";
         ResultSet result = mySqlClient.queryDatabaseStatement(query);
