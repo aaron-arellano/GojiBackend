@@ -12,7 +12,6 @@ public class Task {
     private UUID taskID;
     private String taskTitle;
     private Date taskRevealedDate;
-    private Date taskCheckboxDate;
     private boolean taskRealized;
     private boolean taskDeferred;
     private String photoFilePath;
@@ -92,16 +91,6 @@ public class Task {
     @SuppressWarnings("javadoc")
     public void setDeferred(boolean taskDeferred) {
         this.taskDeferred = taskDeferred;
-    }
-
-    @SuppressWarnings("javadoc")
-    public Date getCheckboxDate() {
-        return taskCheckboxDate;
-    }
-
-    @SuppressWarnings("javadoc")
-    public void setCheckboxDate(Date taskCheckboxDate) {
-        this.taskCheckboxDate = taskCheckboxDate;
     }
 
     @SuppressWarnings("javadoc")

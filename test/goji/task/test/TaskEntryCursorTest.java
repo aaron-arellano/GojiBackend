@@ -21,12 +21,13 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Date;
+import java.util.List;
 import java.util.logging.Logger;
 
 /** Test class to ensure non-regression of TaskEntryCursor DAO methods
 *
 *  @author Aaron
-*  @version 2020.11.16
+*  @version 2020.11.17
 */
 public class TaskEntryCursorTest {
 
@@ -45,7 +46,7 @@ public class TaskEntryCursorTest {
 
         // create the tables needed for the test
         this.taskDbHelper = new TaskDbHelper(this.mySqlClient);
-        this.taskDbHelper.createDbCreateTable();
+        this.taskDbHelper.createDbTable();
     }
 
     @SuppressWarnings("javadoc")
@@ -64,21 +65,10 @@ public class TaskEntryCursorTest {
     @SuppressWarnings("javadoc")
     @Test
     public void addTaskEntryTest() {
-        Task task = new Task();
-        task.setTitle("example");
-        task.setCheckboxDate(new Date());
-        task.setRevealedDate(new Date());
-        task.setDeferred(true);
-        task.setRealized(false);
-        task.setTaskEntries(null);
-        task.setPhotoFilePath("C:\\temp\\photo.jpg");
 
-        // add task to database for FK constraint
-        addTaskToDb(task);
+        Task task = addTaskToDb();
 
-        String entryText = "test entry text";
-        Date entryDate = new Date();
-        TaskEntry taskEntry = new TaskEntry(entryText, entryDate, TaskEntryKind.COMMENT);
+        TaskEntry taskEntry = createTaskEntry();
         String entryId = taskEntry.getTaskEntryID().toString();
 
         taskEntryCursor.addTaskEntry(taskEntry, task);
@@ -96,26 +86,28 @@ public class TaskEntryCursorTest {
             assertEquals(1, count);
         }
         catch (SQLException se) {
-            // do nothing
+            LOGGER.warning(se.toString());
         }
 
         query = "SELECT * FROM task_entry WHERE entry_uuid = \"" + entryId+"\"";
         result = mySqlClient.queryDatabaseStatement(query);
 
         try {
-            String textActual = result.getString("entry_text");
-            assertEquals(entryText, textActual);
+            if(result.next()){
+                String textActual = result.getString("entry_text");
+                assertEquals(taskEntry.getEntryText() , textActual);
 
-            String entryIdActual = result.getString("entry_uuid");
-            assertEquals(entryId, entryIdActual);
+                String entryIdActual = result.getString("entry_uuid");
+                assertEquals(entryId, entryIdActual);
 
-            Date entryDateActual = new Date(result.getLong("entry_date"));
-            assertEquals(0, entryDate.compareTo(entryDateActual));
+                Date entryDateActual = new Date(result.getLong("entry_date"));
+                assertEquals(0, taskEntry.getEntryDate().compareTo(entryDateActual));
 
-            String entryKindActual = result.getString("entry_kind");
-            assertEquals(TaskEntryKind.COMMENT.name(), entryKindActual);
+                String entryKindActual = result.getString("entry_kind");
+                assertEquals(TaskEntryKind.COMMENT.name(), entryKindActual);
 
-            stmt = result.getStatement();
+                stmt = result.getStatement();
+            }
         }
         catch (SQLException se) {
             LOGGER.warning(se.toString());
@@ -125,8 +117,95 @@ public class TaskEntryCursorTest {
         }
     }
 
+    @SuppressWarnings("javadoc")
+    @Test
+    public void updateTaskEntryTextTest() {
 
-    private void addTaskToDb(Task task) {
+        Task task = addTaskToDb();
+
+        TaskEntry taskEntry = createTaskEntry();
+        String entryId = taskEntry.getTaskEntryID().toString();
+
+        taskEntryCursor.addTaskEntry(taskEntry, task);
+
+        String query = "SELECT entry_text FROM task_entry WHERE entry_uuid = \"" + entryId+"\"";
+
+        ResultSet result = mySqlClient.queryDatabaseStatement(query);
+        Statement stmt = null;
+
+        try {
+            String actual = "";
+            if (result.next()) {
+                actual = result.getString("entry_text");
+            }
+            assertEquals("test entry text", actual);
+        }
+        catch (SQLException se) {
+            LOGGER.warning(se.toString());
+        }
+
+        // the actual method to test
+        String newText = "New text to set";
+        taskEntry.setEntryText(newText);
+        taskEntryCursor.updateTaskEntryText(taskEntry);
+
+        result = mySqlClient.queryDatabaseStatement(query);
+
+        try {
+            String actual = "";
+            if (result.next()) {
+                actual = result.getString("entry_text");
+            }
+            assertEquals(newText, actual);
+        }
+        catch (SQLException se) {
+            LOGGER.warning(se.toString());
+        }
+        finally {
+            mySqlClient.closeStatementResultSet(stmt, result);
+        }
+    }
+
+    @SuppressWarnings("javadoc")
+    @Test
+    public void getTaskEntriesTest() {
+
+        Task task = addTaskToDb();
+
+        TaskEntry taskEntry = createTaskEntry();
+        TaskEntry taskEntry2 = createTaskEntry();
+        taskEntry2.setEntryText("Text for entry2 in this task");
+
+        taskEntryCursor.addTaskEntry(taskEntry, task);
+        taskEntryCursor.addTaskEntry(taskEntry2, task);
+
+        List<TaskEntry> entryList = taskEntryCursor.getTaskEntries(task);
+
+        assertEquals(2, entryList.size());
+
+        TaskEntry actualEntry = entryList.get(0);
+        TaskEntry actualEntry2 = entryList.get(1);
+
+        assertEquals(taskEntry.getEntryText(), actualEntry.getEntryText());
+        assertEquals(taskEntry.getTaskEntryID().toString(), actualEntry.getTaskEntryID().toString());
+        assertEquals(taskEntry.getTaskEntryKind().name(), actualEntry.getTaskEntryKind().name());
+        assertEquals(0, taskEntry.getEntryDate().compareTo(actualEntry.getEntryDate()));
+
+        assertEquals(taskEntry2.getEntryText(), actualEntry2.getEntryText());
+        assertEquals(taskEntry2.getTaskEntryID().toString(), actualEntry2.getTaskEntryID().toString());
+        assertEquals(taskEntry2.getTaskEntryKind().name(), actualEntry2.getTaskEntryKind().name());
+        assertEquals(0, taskEntry2.getEntryDate().compareTo(actualEntry2.getEntryDate()));
+    }
+
+    private Task addTaskToDb() {
+        Task task = new Task();
+        task.setTitle("example");
+        task.setRevealedDate(new Date());
+        task.setDeferred(true);
+        task.setRealized(false);
+        task.setTaskEntries(null);
+        task.setPhotoFilePath("C:\\temp\\photo.jpg");
+
         String insert = StringUtils.applyFormat(
             "INSERT INTO {0} ({1}, {2}, {3}, {4}, {5}, {6}) " + "VALUES(?,?,?,?,?,?)",
             TaskTable.NAME,
@@ -137,7 +216,6 @@ public class TaskEntryCursorTest {
             TaskTable.Cols.REALIZED,
             TaskTable.Cols.PHOTOPATH);
 
-        // add the Task
         PreparedStatement stmt = null;
         try {
 
@@ -157,6 +235,16 @@ public class TaskEntryCursorTest {
         finally {
             mySqlClient.closeStatementResultSet(stmt, null);
         }
+
+        return task;
+    }
+
+    private TaskEntry createTaskEntry() {
+        String entryText = "test entry text";
+        Date entryDate = new Date();
+        TaskEntry taskEntry = new TaskEntry(entryText, entryDate, TaskEntryKind.COMMENT);
+
+        return taskEntry;
     }
 
 }

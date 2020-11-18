@@ -8,5 +8,5 @@ package goji.data;
 public interface IDbHelper {
 
     @SuppressWarnings("javadoc")
-    public void createDbCreateTable();
+    public void createDbTable();
 }

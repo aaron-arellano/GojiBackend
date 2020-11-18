@@ -28,7 +28,7 @@ public class TaskDbHelper implements IDbHelper {
     /** Create the tables needed for this database
      *
      */
-    public void createDbCreateTable() {
+    public void createDbTable() {
 
         LOGGER.info("Creating table: " + TaskTable.NAME);
         String stmt = StringUtils.applyFormat("CREATE TABLE IF NOT EXISTS {0} ( "
@@ -52,7 +52,7 @@ public class TaskDbHelper implements IDbHelper {
             + "{2} LONG, "
             + "{3} VARCHAR(30), "
             + "{4} VARCHAR(50) NOT NULL UNIQUE, "
-            + "{5} VARCHAR(50) NOT NULL UNIQUE, "
+            + "{5} VARCHAR(50) NOT NULL, "
             + "FOREIGN KEY ({6}) REFERENCES {7} ({8}) )",
             TaskEntryTable.NAME, TaskEntryTable.Cols.TEXT, TaskEntryTable.Cols.DATE,
             TaskEntryTable.Cols.KIND, TaskEntryTable.Cols.ENTRYID, TaskEntryTable.Cols.TASKUUID,
