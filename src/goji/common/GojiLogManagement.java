@@ -12,8 +12,8 @@ public class GojiLogManagement {
 
     private GojiLogManagement() {}
 
-    /**
-     * Place a description of your method here.
+    /** Create loggers for this project
+     * 
      * @param loggerName
      * @return the logger requested by an object
      */
