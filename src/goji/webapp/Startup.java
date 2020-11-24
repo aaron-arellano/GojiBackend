@@ -3,6 +3,8 @@ package goji.webapp;
 import java.util.logging.Logger;
 import javax.servlet.*;
 import javax.servlet.http.*;
+
+import goji.common.AgentUtils;
 import goji.common.GojiLogManagement;
 
 /** Startup class for the Goji backend web app. Initialization of the project begins here.
@@ -20,7 +22,8 @@ public class Startup extends HttpServlet {
 		super.init(config);
 		
 		LOGGER.info("Setting up the agent environment");
-		GojiAgent.getInstance().createEnvironment();
+		AgentUtils agentUtils = new AgentUtils();
+		agentUtils.getAgent().createAgentTables();
 		LOGGER.info("Done setting up the agent environment");
 	}
 }
