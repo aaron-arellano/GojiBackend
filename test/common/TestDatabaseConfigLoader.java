@@ -4,8 +4,8 @@ import goji.data.DatabaseConfigWrapper;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 
-/** Utility class to house common methods for database operations
- *
+/** Utility class that gets and creates the Test configuration
+ *  needed for a test environment
  *
  *  @author Aaron
  *  @version 2020.10.27
