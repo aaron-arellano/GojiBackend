@@ -158,7 +158,7 @@ public class TaskCursorTest {
             LOGGER.warning(se.toString());
         }
 
-        taskCursor.deleteTask(task);
+        taskCursor.deleteTask(task.getId().toString());
         result = mySqlClient.queryDatabaseStatement(query);
         try {
 

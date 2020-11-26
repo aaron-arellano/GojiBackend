@@ -3,6 +3,7 @@ package goji.task;
 import goji.common.GojiLogManagement;
 import goji.common.utils.StringUtils;
 import goji.data.TaskDbSchema.TaskTable;
+import goji.webapp.exception.NotFoundException;
 import goji.data.SqlClient;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -185,16 +186,20 @@ public class TaskCursor implements ITaskCursor {
     *
     * @param task the Task that gets deleted
     */
-    public void deleteTask(Task task) {
-        LOGGER.info("Deleteing Task with uuid: " + task.getId().toString());
+    public void deleteTask(String uuid) {
+        LOGGER.info("Deleteing Task with uuid: " + uuid);
 
         String delete = StringUtils.applyFormat(
             "DELETE FROM {0} WHERE task_uuid = \"{1}\"",
             TaskTable.NAME,
-            task.getId().toString());
+            uuid);
 
-        mySqlClient.updateDatabaseStatement(delete);
-
+        int rows = mySqlClient.updateDatabaseStatement(delete);
+        
+        if (rows == 0) {
+        	throw new NotFoundException("task: "+ uuid +" was not found, delete task failed.");
+        }
+        
         LOGGER.info("Task deleted from the database...");
     }
 

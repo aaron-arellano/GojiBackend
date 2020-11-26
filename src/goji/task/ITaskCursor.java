@@ -19,6 +19,6 @@ public interface ITaskCursor {
     void addTask(Task task);
 
     @SuppressWarnings("javadoc")
-    void deleteTask(Task task);
+    void deleteTask(String uuid);
 
 }
