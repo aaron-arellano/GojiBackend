@@ -18,7 +18,6 @@ import goji.common.AgentUtils;
 import goji.data.SqlClient;
 import goji.task.ITaskCursor;
 import goji.task.TaskCursor;
-import goji.webapp.exception.NotFoundException;
 
 @Path(ApiConstants.TASK_CONTROLLER_PATH)
 public class TaskController {
@@ -41,15 +40,8 @@ public class TaskController {
 		SqlClient client = agentUtils.getAgent().getSqlClient();
 		ITaskCursor cursor = new TaskCursor(client);
 		
-		try {
-			cursor.deleteTask(taskId);
-		}
-		catch(NotFoundException nfe) {
-			return Response.status(404).entity(nfe.toString()).build();
-		}
+		cursor.deleteTask(taskId);
 		
         return Response.ok().build();
     }
-	
-
 }
