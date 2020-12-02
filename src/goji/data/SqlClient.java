@@ -60,6 +60,7 @@ public abstract class SqlClient {
        finally {
            ConnectionOperations.closeDbConnections(null, stmt, null);
        }
+       
        LOGGER.info("Database successfully updated...");
        return rows;
    }

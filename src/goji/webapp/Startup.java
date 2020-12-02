@@ -18,7 +18,6 @@ public class Startup implements ServletContextListener {
 	private AgentUtils agentUtils;
 	private static final Logger LOGGER = GojiLogManagement.createLogger(Startup.class.getName());
 
-
     @Override
     public void contextInitialized(ServletContextEvent event) {
     	LOGGER.info("Setting up the agent environment");

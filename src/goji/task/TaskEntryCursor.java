@@ -57,7 +57,7 @@ public class TaskEntryCursor implements ITaskEntryCursor{
             stmt.setLong(2, taskEntry.getEntryDate().getTime());
             stmt.setString(3, taskEntry.getTaskEntryKind().name());
             stmt.setString(4, taskEntry.getTaskEntryID().toString());
-            stmt.setString(5, task.getId().toString());
+            stmt.setString(5, task.getTaskId().toString());
 
             stmt.executeUpdate();
         }
@@ -117,7 +117,7 @@ public class TaskEntryCursor implements ITaskEntryCursor{
      */
     public List<TaskEntry>getTaskEntries(Task task) {
         List<TaskEntry> taskEntries = new ArrayList<>();
-        String taskId = task.getId().toString();
+        String taskId = task.getTaskId().toString();
 
         LOGGER.info("Querying all TaskEntries for Task with uuid: " + taskId);
         String query =

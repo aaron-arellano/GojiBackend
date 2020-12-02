@@ -17,6 +17,7 @@ import javax.xml.bind.JAXBElement;
 import goji.common.AgentUtils;
 import goji.data.SqlClient;
 import goji.task.ITaskCursor;
+import goji.task.Task;
 import goji.task.TaskCursor;
 
 @Path(ApiConstants.TASK_CONTROLLER_PATH)
@@ -27,7 +28,16 @@ public class TaskController {
     @Produces({MediaType.APPLICATION_JSON})
     public Response getTask(@PathParam("taskId") String taskId) {
         
-		return Response.ok().build();
+		AgentUtils agentUtils = new AgentUtils();
+		
+		SqlClient client = agentUtils.getAgent().getSqlClient();
+		ITaskCursor cursor = new TaskCursor(client);
+		
+		Task task = cursor.getTask(taskId);
+		
+		//String taskJson = "";
+		
+		return Response.ok(task, MediaType.APPLICATION_JSON).build();
     }
 	
 	@DELETE
