@@ -1,19 +1,28 @@
 package goji.task;
 
 import java.util.*;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 /** Class representation of a Task object
  *
  *  @author Aaron
- *  @version 2020.10.30
+ *  @version 2020.12.02
  */
+@JsonPropertyOrder({"taskID","taskTitle","taskRevealedDate","taskRealized","taskDeferred","photoFilePath"})
 public class Task {
 
+	@JsonProperty()
     private UUID taskID;
+	@JsonProperty()
     private String taskTitle;
+	@JsonProperty()
     private Date taskRevealedDate;
+	@JsonProperty()
     private boolean taskRealized;
+	@JsonProperty()
     private boolean taskDeferred;
+	@JsonProperty()
     private String photoFilePath;
     //private List<TaskEntry> taskEntries;
 
@@ -22,10 +31,6 @@ public class Task {
      */
     public Task() {
         this(UUID.randomUUID());
-        taskTitle = null;
-        taskRealized = false;
-        taskDeferred = false;
-        //taskEntries = new ArrayList<>();
     }
 
     /** Create a new Task object and sets the uuid of the Task. Primarily
@@ -37,7 +42,7 @@ public class Task {
         this.taskID = taskID;
     }
 
-    public UUID getTaskId() {
+    public UUID getTaskID() {
         return taskID;
     }
 

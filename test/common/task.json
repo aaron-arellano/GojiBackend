@@ -1,0 +1,6 @@
+{
+    "taskTitle": "Sample Task",
+    "taskRealized": false,
+    "taskDeferred": true,
+    "photoFilePath": "C:\\photoSample\\example.jpg"
+}

@@ -77,6 +77,7 @@ public class TaskCursor implements ITaskCursor {
         }
         
         if (rows == 0 ) {
+        	LOGGER.severe("Get task failed for task " + uuid);
         	throw new NotFoundException("task: "+ uuid +" was not found, get task failed.");
         }
 
@@ -117,7 +118,6 @@ public class TaskCursor implements ITaskCursor {
             .queryDatabaseStatement(query);
         Statement stmt = null;
 
-
         try {
             while (result.next()) {
                 String taskId = result.getString(TaskTable.Cols.UUID);
@@ -151,8 +151,9 @@ public class TaskCursor implements ITaskCursor {
     *
     * @param task the new Task that gets added
     */
-    public void addTask(Task task) {
-        LOGGER.info("Adding Task with uuid: " + task.getTaskId().toString());
+    public Task addTask(Task task) {
+    	String uuid = task.getTaskID().toString();
+        LOGGER.info("Adding Task with uuid: " + uuid);
 
         String insert = StringUtils.applyFormat(
             "INSERT INTO {0} ({1}, {2}, {3}, {4}, {5}, {6}) " + "VALUES(?,?,?,?,?,?)",
@@ -170,7 +171,7 @@ public class TaskCursor implements ITaskCursor {
         try {
 
             stmt = mySqlClient.getPreparedStatement(insert);
-            stmt.setString(1, task.getTaskId().toString());
+            stmt.setString(1, task.getTaskID().toString());
             stmt.setString(2, task.getTaskTitle());
             stmt.setLong(3, task.getTaskRevealedDate().getTime());
             stmt.setInt(4, task.getTaskDeferred() ? 1 : 0);
@@ -187,6 +188,9 @@ public class TaskCursor implements ITaskCursor {
         }
 
         LOGGER.info("Task added to the database...");
+        
+        Task returnTask = getTask(uuid);
+        return returnTask;
     }
 
 
@@ -205,6 +209,7 @@ public class TaskCursor implements ITaskCursor {
         int rows = mySqlClient.updateDatabaseStatement(delete);
         
         if (rows == 0) {
+        	LOGGER.severe("Delete task failed for task " + uuid);
         	throw new NotFoundException("task: "+ uuid +" was not found, delete task failed.");
         }
         
@@ -215,8 +220,8 @@ public class TaskCursor implements ITaskCursor {
     *
     * @param task the Task that gets updated
     */
-    public void updateTask(Task task) {
-    	String uuid = task.getTaskId().toString();
+    public Task updateTask(Task task) {
+    	String uuid = task.getTaskID().toString();
         LOGGER.info("Updating Task with uuid: " + uuid);
 
         int rows = 0;
@@ -252,9 +257,13 @@ public class TaskCursor implements ITaskCursor {
         }
         
         if (rows == 0) {
+        	LOGGER.severe("Update task failed for task " + uuid);
         	throw new NotFoundException("task: "+ uuid +" was not found, update task failed.");
         }
 
         LOGGER.info("Task updated in database...");
+        
+        Task updated = getTask(task.getTaskID().toString());
+        return updated;
     }
 }

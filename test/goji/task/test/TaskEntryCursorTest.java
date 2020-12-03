@@ -37,7 +37,6 @@ public class TaskEntryCursorTest {
     private TaskDbHelper taskDbHelper;
     private DatabaseConfigWrapper wrapper;
 
-    @SuppressWarnings("javadoc")
     @Before
     public void setUp() throws Exception {
         this.wrapper = TestDatabaseConfigLoader.createTestDbConfig();
@@ -49,7 +48,6 @@ public class TaskEntryCursorTest {
         this.taskDbHelper.createDbTable();
     }
 
-    @SuppressWarnings("javadoc")
     @After
     public void tearDown() throws Exception {
         // drop the tables after done testing
@@ -62,7 +60,6 @@ public class TaskEntryCursorTest {
     }
 
 
-    @SuppressWarnings("javadoc")
     @Test
     public void addTaskEntryTest() {
 
@@ -117,7 +114,6 @@ public class TaskEntryCursorTest {
         }
     }
 
-    @SuppressWarnings("javadoc")
     @Test
     public void updateTaskEntryTextTest() {
 
@@ -166,7 +162,6 @@ public class TaskEntryCursorTest {
         }
     }
 
-    @SuppressWarnings("javadoc")
     @Test
     public void getTaskEntriesTest() {
 
@@ -220,7 +215,7 @@ public class TaskEntryCursorTest {
         try {
 
             stmt = mySqlClient.getPreparedStatement(insert);
-            stmt.setString(1, task.getTaskId().toString());
+            stmt.setString(1, task.getTaskID().toString());
             stmt.setString(2, task.getTaskTitle());
             stmt.setLong(3, task.getTaskRevealedDate().getTime());
             stmt.setInt(4, task.getTaskDeferred() ? 1 : 0);
