@@ -3,7 +3,6 @@ package goji.webapp.api;
 import java.util.Date;
 import java.util.UUID;
 import java.util.logging.Logger;
-import javax.ws.rs.BadRequestException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -21,6 +20,7 @@ import goji.data.SqlClient;
 import goji.task.ITaskCursor;
 import goji.task.Task;
 import goji.task.TaskCursor;
+import goji.task.TasksWrapper;
 
 @Path(ApiConstants.TASK_CONTROLLER_PATH)
 public class TaskController {
@@ -30,11 +30,9 @@ public class TaskController {
 	@Path(ApiConstants.TASK_PATH)
     @Produces({MediaType.APPLICATION_JSON})
     public Response getTask(@PathParam("taskId") String taskId) { 
-		validUuid(taskId);
+		ObjectUtils.validUuid(taskId);
 		
-		AgentUtils agentUtils = new AgentUtils();
-		SqlClient client = agentUtils.getAgent().getSqlClient();
-		ITaskCursor cursor = new TaskCursor(client);
+		ITaskCursor cursor = getTaskCursor();
 		
 		LOGGER.info("Start GET task for user: " + taskId);
 		Task task = cursor.getTask(taskId);
@@ -44,15 +42,46 @@ public class TaskController {
 		return Response.ok(result, MediaType.APPLICATION_JSON).build();
     }
 	
+	@GET
+	@Path(ApiConstants.TASK_LIST_PATH)
+	@Produces({MediaType.APPLICATION_JSON})
+	public Response getTasks() {
+		ITaskCursor cursor = getTaskCursor();
+		TasksWrapper wrapper = new TasksWrapper();
+		
+		LOGGER.info("Start GET all tasks for user");
+		wrapper.setTasks(cursor.getTasks());
+		String result = JsonObjectMapper.objectToJsonString(wrapper);
+		LOGGER.info("Stop GET all tasks for user");
+		
+		return Response.ok(result, MediaType.APPLICATION_JSON).build();
+	}
+	
+	@PUT
+    @Produces({MediaType.APPLICATION_JSON})
+	@Consumes({MediaType.APPLICATION_JSON})
+    public Response addTask(Task task) {
+		ObjectUtils.validateObjectNotNull(task);
+		
+		ITaskCursor cursor = getTaskCursor();
+		String uuid = task.getTaskID().toString();
+		task.setTaskRevealedDate(new Date());
+		
+		LOGGER.info("Start add task for user: " + uuid);
+		Task addedTask = cursor.addTask(task);
+		String result = JsonObjectMapper.objectToJsonString(addedTask);
+		LOGGER.info("Stop add task for user: " + uuid);
+		
+		return Response.ok(result, MediaType.APPLICATION_JSON).build();
+    }
+	
 	@DELETE
 	@Path(ApiConstants.TASK_PATH)
 	@Produces(MediaType.APPLICATION_JSON)
     public Response deleteTask(@PathParam("taskId") String taskId) {
-		validUuid(taskId);
+		ObjectUtils.validUuid(taskId);
 		
-		AgentUtils agentUtils = new AgentUtils();
-		SqlClient client = agentUtils.getAgent().getSqlClient();
-		ITaskCursor cursor = new TaskCursor(client);
+		ITaskCursor cursor = getTaskCursor();
 		
 		LOGGER.info("Start delete task for user: " + taskId);
 		cursor.deleteTask(taskId);
@@ -66,12 +95,10 @@ public class TaskController {
     @Produces({MediaType.APPLICATION_JSON})
 	@Consumes({MediaType.APPLICATION_JSON})
     public Response updateTask(@PathParam("taskId") String taskId, Task task) {
-		validUuid(taskId);
+		ObjectUtils.validUuid(taskId);
 		ObjectUtils.validateObjectNotNull(task);
 		
-		AgentUtils agentUtils = new AgentUtils();
-		SqlClient client = agentUtils.getAgent().getSqlClient();
-		ITaskCursor cursor = new TaskCursor(client);
+		ITaskCursor cursor = getTaskCursor();
 		Task taskWrapper = wrapTask(taskId, task);
 		
 		LOGGER.info("Start update task for user: " + taskId);
@@ -81,34 +108,13 @@ public class TaskController {
 		
 		return Response.ok(result, MediaType.APPLICATION_JSON).build();
     }
-	
-	@PUT
-    @Produces({MediaType.APPLICATION_JSON})
-	@Consumes({MediaType.APPLICATION_JSON})
-    public Response createTask(Task task) {
-		ObjectUtils.validateObjectNotNull(task);
 		
+	private ITaskCursor getTaskCursor() {
 		AgentUtils agentUtils = new AgentUtils();
 		SqlClient client = agentUtils.getAgent().getSqlClient();
 		ITaskCursor cursor = new TaskCursor(client);
-		String uuid = task.getTaskID().toString();
-		task.setTaskRevealedDate(new Date());
 		
-		LOGGER.info("Start add task for user: " + uuid);
-		Task addedTask = cursor.addTask(task);
-		String result = JsonObjectMapper.objectToJsonString(addedTask);
-		LOGGER.info("Stop add task for user: " + uuid);
-		
-		return Response.ok(result, MediaType.APPLICATION_JSON).build();
-    }
-	
-	private void validUuid(String uuid) {
-		String regex = "[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}";
-		
-		if(!uuid.matches(regex)) {
-			LOGGER.severe("User task id not valid " + uuid);
-			throw new BadRequestException("Provided task id is not valid " + uuid);
-		}
+		return cursor;
 	}
 	
 	private Task wrapTask(String uuid, Task task) {

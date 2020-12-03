@@ -85,16 +85,6 @@ public class Task {
     public String setPhotoFilePath(String photoFilePath) {
         return this.photoFilePath = photoFilePath;
     }
-    
-    /*@SuppressWarnings("javadoc")
-    public List<TaskEntry> getTaskEntries() {
-        return taskEntries;
-    }
-
-    @SuppressWarnings("javadoc")
-    public void setTaskEntries(List<TaskEntry> taskEntries) {
-        this.taskEntries = taskEntries;
-    }*/
 
     /** Adds new revealed entry to a TaskEntry
      *
