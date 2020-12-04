@@ -1,16 +1,23 @@
 package goji.task;
 
 import java.util.*;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 /** Class representation of a TaskEntry created by the end-user
  *
  *  @author Aaron
- *  @version 2020.10.29
+ *  @version 2020.12.02
  */
+@JsonPropertyOrder({"taskEntryID","entryText","entryDate","taskEntryKind"})
 public class TaskEntry {
+	@JsonProperty()
     private String entryText;
+	@JsonProperty()
     private Date entryDate;
+	@JsonProperty()
     private TaskEntryKind taskEntryKind;
+	@JsonProperty()
     private UUID taskEntryID;
 
     /** Create a new TaskEntry object from TaskEntryLab
@@ -34,37 +41,34 @@ public class TaskEntry {
         this.taskEntryID = taskEntryID;
     }
 
-    @SuppressWarnings("javadoc")
     public String getEntryText() {
         return entryText;
     }
 
-    @SuppressWarnings("javadoc")
     public void setEntryText(String entryText) {
         this.entryText = entryText;
     }
 
-    @SuppressWarnings("javadoc")
     public Date getEntryDate() {
         return entryDate;
     }
 
-    @SuppressWarnings("javadoc")
     public void setEntryDate(Date entryDate) {
         this.entryDate = entryDate;
     }
 
-    @SuppressWarnings("javadoc")
     public UUID getTaskEntryID() {
         return taskEntryID;
     }
+    
+    public void setTaskEntryID(UUID uuid) {
+    	this.taskEntryID = uuid;
+    }
 
-    @SuppressWarnings("javadoc")
     public TaskEntryKind getTaskEntryKind() {
         return taskEntryKind;
     }
 
-    @SuppressWarnings("javadoc")
     public void setTaskEntryKind(TaskEntryKind taskEntryKind) {
         this.taskEntryKind = taskEntryKind;
     }

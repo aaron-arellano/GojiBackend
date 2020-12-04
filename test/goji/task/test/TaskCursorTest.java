@@ -32,7 +32,6 @@ public class TaskCursorTest {
     private TaskDbHelper taskDbHelper;
     private DatabaseConfigWrapper wrapper;
 
-    @SuppressWarnings("javadoc")
     @Before
     public void setUp() throws Exception {
         this.wrapper = TestDatabaseConfigLoader.createTestDbConfig();
@@ -44,7 +43,6 @@ public class TaskCursorTest {
         this.taskDbHelper.createDbTable();
     }
 
-    @SuppressWarnings("javadoc")
     @After
     public void tearDown() throws Exception {
         // drop the tables after done testing
@@ -56,29 +54,27 @@ public class TaskCursorTest {
         this.mySqlClient.closeConnection();
     }
 
-    @SuppressWarnings("javadoc")
     @Test
     public void getTaskTest() {
         Task task = createTask();
 
         taskCursor.addTask(task);
 
-        Task actualTask = taskCursor.getTask(task.getId().toString());
+        Task actualTask = taskCursor.getTask(task.getTaskID().toString());
 
-        assertEquals(task.getId(), actualTask.getId());
-        assertEquals(task.getTitle(), actualTask.getTitle());
-        assertEquals(0, task.getRevealedDate().compareTo(actualTask.getRevealedDate()));
+        assertEquals(task.getTaskID(), actualTask.getTaskID());
+        assertEquals(task.getTaskTitle(), actualTask.getTaskTitle());
+        assertEquals(0, task.getTaskRevealedDate().compareTo(actualTask.getTaskRevealedDate()));
         assertEquals(task.getPhotoFilePath(), actualTask.getPhotoFilePath());
-        assertTrue(actualTask.isDeferred());
-        assertFalse(actualTask.isRealized());
+        assertTrue(actualTask.getTaskDeferred());
+        assertFalse(actualTask.getTaskRealized());
     }
 
-    @SuppressWarnings("javadoc")
     @Test
     public void getTasksTest() {
         Task task = createTask();
         Task task2 = createTask();
-        task2.setTitle("New title for second task");
+        task2.setTaskTitle("New title for second task");
 
         taskCursor.addTask(task);
         taskCursor.addTask(task2);
@@ -88,28 +84,27 @@ public class TaskCursorTest {
         Task actual1 = actualTasks.get(0);
         Task actual2 = actualTasks.get(1);
 
-        assertEquals(task.getId(), actual1.getId());
-        assertEquals(task.getTitle(), actual1.getTitle());
-        assertEquals(0, task.getRevealedDate().compareTo(actual1.getRevealedDate()));
+        assertEquals(task.getTaskID(), actual1.getTaskID());
+        assertEquals(task.getTaskTitle(), actual1.getTaskTitle());
+        assertEquals(0, task.getTaskRevealedDate().compareTo(actual1.getTaskRevealedDate()));
         assertEquals(task.getPhotoFilePath(), actual1.getPhotoFilePath());
-        assertTrue(actual1.isDeferred());
-        assertFalse(actual1.isRealized());
+        assertTrue(actual1.getTaskDeferred());
+        assertFalse(actual1.getTaskRealized());
 
-        assertEquals(task2.getId(), actual2.getId());
-        assertEquals(task2.getTitle(), actual2.getTitle());
-        assertEquals(0, task2.getRevealedDate().compareTo(actual2.getRevealedDate()));
+        assertEquals(task2.getTaskID(), actual2.getTaskID());
+        assertEquals(task2.getTaskTitle(), actual2.getTaskTitle());
+        assertEquals(0, task2.getTaskRevealedDate().compareTo(actual2.getTaskRevealedDate()));
         assertEquals(task2.getPhotoFilePath(), actual2.getPhotoFilePath());
-        assertTrue(actual2.isDeferred());
-        assertFalse(actual2.isRealized());
+        assertTrue(actual2.getTaskDeferred());
+        assertFalse(actual2.getTaskRealized());
     }
 
 
-    @SuppressWarnings("javadoc")
     @Test
     public void addTaskTest() {
         Task task = createTask();
 
-        String taskId = task.getId().toString();
+        String taskId = task.getTaskID().toString();
 
         taskCursor.addTask(task);
 
@@ -121,8 +116,8 @@ public class TaskCursorTest {
         try {
 
             if (result.next()) {
-                assertEquals(task.getTitle() , result.getString("task_title"));
-                assertEquals(0, task.getRevealedDate().compareTo(new Date(result.getLong("task_date"))));
+                assertEquals(task.getTaskTitle() , result.getString("task_title"));
+                assertEquals(0, task.getTaskRevealedDate().compareTo(new Date(result.getLong("task_date"))));
                 assertEquals(taskId , result.getString("task_uuid"));
                 assertEquals(1, result.getInt("task_deferred"));
                 assertEquals(0, result.getInt("task_realized"));
@@ -137,7 +132,6 @@ public class TaskCursorTest {
         }
     }
 
-    @SuppressWarnings("javadoc")
     @Test
     public void deleteTaskTest() {
         Task task = createTask();
@@ -158,7 +152,7 @@ public class TaskCursorTest {
             LOGGER.warning(se.toString());
         }
 
-        taskCursor.deleteTask(task);
+        taskCursor.deleteTask(task.getTaskID().toString());
         result = mySqlClient.queryDatabaseStatement(query);
         try {
 
@@ -174,46 +168,42 @@ public class TaskCursorTest {
         }
     }
 
-    @SuppressWarnings("javadoc")
     @Test
     public void updateTaskTest() {
         Task task = createTask();
 
         taskCursor.addTask(task);
 
-        Task getTask = taskCursor.getTask(task.getId().toString());
+        Task getTask = taskCursor.getTask(task.getTaskID().toString());
 
-        assertEquals(task.getId(), getTask.getId());
-        assertEquals(task.getTitle(), getTask.getTitle());
-        assertEquals(0, task.getRevealedDate().compareTo(getTask.getRevealedDate()));
+        assertEquals(task.getTaskID(), getTask.getTaskID());
+        assertEquals(task.getTaskTitle(), getTask.getTaskTitle());
+        assertEquals(0, task.getTaskRevealedDate().compareTo(getTask.getTaskRevealedDate()));
         assertEquals(task.getPhotoFilePath(), getTask.getPhotoFilePath());
-        assertTrue(getTask.isDeferred());
-        assertFalse(getTask.isRealized());
+        assertTrue(getTask.getTaskDeferred());
+        assertFalse(getTask.getTaskRealized());
 
         String updateTitle = "This title was updated for the test";
-        task.setTitle(updateTitle);
-        task.setDeferred(false);
-        task.setRealized(true);
+        task.setTaskTitle(updateTitle);
+        task.setTaskDeferred(false);
+        task.setTaskRealized(true);
 
-        taskCursor.updateTask(task);
+        getTask = taskCursor.updateTask(task);
 
-        getTask = taskCursor.getTask(task.getId().toString());
-
-        assertEquals(task.getId(), getTask.getId());
-        assertEquals(updateTitle, getTask.getTitle());
-        assertEquals(0, task.getRevealedDate().compareTo(getTask.getRevealedDate()));
+        assertEquals(task.getTaskID(), getTask.getTaskID());
+        assertEquals(updateTitle, getTask.getTaskTitle());
+        assertEquals(0, task.getTaskRevealedDate().compareTo(getTask.getTaskRevealedDate()));
         assertEquals(task.getPhotoFilePath(), getTask.getPhotoFilePath());
-        assertFalse(getTask.isDeferred());
-        assertTrue(getTask.isRealized());
+        assertFalse(getTask.getTaskDeferred());
+        assertTrue(getTask.getTaskRealized());
     }
 
     private Task createTask() {
         Task task = new Task();
-        task.setTitle("Adding a Task test");
-        task.setRevealedDate(new Date());
-        task.setDeferred(true);
-        task.setRealized(false);
-        task.setTaskEntries(null);
+        task.setTaskTitle("Adding a Task test");
+        task.setTaskRevealedDate(new Date());
+        task.setTaskDeferred(true);
+        task.setTaskRealized(false);
         task.setPhotoFilePath("C:\\temp\\photo.jpg");
 
         return task;

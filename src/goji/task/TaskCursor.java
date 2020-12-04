@@ -13,6 +13,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 import java.util.logging.Logger;
+import javax.ws.rs.NotFoundException;
 
 /** Data Access Object for database operations on a Task class
  *
@@ -47,6 +48,7 @@ public class TaskCursor implements ITaskCursor {
         ResultSet result = mySqlClient
             .queryDatabaseStatement(query);
         Statement stmt = null;
+        int rows = 0;
 
         String uuidString = "";
         String title = "";
@@ -63,6 +65,7 @@ public class TaskCursor implements ITaskCursor {
                 isDeferred = result.getInt(TaskTable.Cols.DEFERRED);
                 isRealized = result.getInt(TaskTable.Cols.REALIZED);
                 photoPath = result.getString(TaskTable.Cols.PHOTOPATH);
+                rows++;
             }
             stmt = result.getStatement();
         }
@@ -71,6 +74,11 @@ public class TaskCursor implements ITaskCursor {
         }
         finally {
             mySqlClient.closeStatementResultSet(stmt, result);
+        }
+        
+        if (rows == 0 ) {
+        	LOGGER.severe("Get task failed for task " + uuid);
+        	throw new NotFoundException("task: "+ uuid +" was not found, get task failed.");
         }
 
         LOGGER.info(
@@ -83,11 +91,11 @@ public class TaskCursor implements ITaskCursor {
                 Integer.toString(isRealized)));
 
         Task task = new Task(UUID.fromString(uuidString));
-        task.setTitle(title);
-        task.setRevealedDate(new Date(date));
-        task.setDeferred(isDeferred != 0);
-        task.setRealized(isRealized != 0);
-        task.setTaskEntries(null);
+        task.setTaskTitle(title);
+        task.setTaskRevealedDate(new Date(date));
+        task.setTaskDeferred(isDeferred != 0);
+        task.setTaskRealized(isRealized != 0);
+        //task.setTaskEntries(null);
         task.setPhotoFilePath(photoPath);
 
         return task;
@@ -110,16 +118,15 @@ public class TaskCursor implements ITaskCursor {
             .queryDatabaseStatement(query);
         Statement stmt = null;
 
-
         try {
             while (result.next()) {
                 String taskId = result.getString(TaskTable.Cols.UUID);
                 Task task = new Task(UUID.fromString(taskId));
-                task.setTitle(result.getString(TaskTable.Cols.TITLE));
-                task.setRevealedDate(
+                task.setTaskTitle(result.getString(TaskTable.Cols.TITLE));
+                task.setTaskRevealedDate(
                     new Date(result.getLong(TaskTable.Cols.DATE)));
-                task.setDeferred(result.getInt(TaskTable.Cols.DEFERRED) != 0);
-                task.setRealized(result.getInt(TaskTable.Cols.REALIZED) != 0);
+                task.setTaskDeferred(result.getInt(TaskTable.Cols.DEFERRED) != 0);
+                task.setTaskRealized(result.getInt(TaskTable.Cols.REALIZED) != 0);
                 task.setPhotoFilePath(result.getString(TaskTable.Cols.PHOTOPATH));
                 LOGGER.info(
                     StringUtils.applyFormat(
@@ -144,8 +151,9 @@ public class TaskCursor implements ITaskCursor {
     *
     * @param task the new Task that gets added
     */
-    public void addTask(Task task) {
-        LOGGER.info("Adding Task with uuid: " + task.getId().toString());
+    public Task addTask(Task task) {
+    	String uuid = task.getTaskID().toString();
+        LOGGER.info("Adding Task with uuid: " + uuid);
 
         String insert = StringUtils.applyFormat(
             "INSERT INTO {0} ({1}, {2}, {3}, {4}, {5}, {6}) " + "VALUES(?,?,?,?,?,?)",
@@ -157,15 +165,17 @@ public class TaskCursor implements ITaskCursor {
             TaskTable.Cols.REALIZED,
             TaskTable.Cols.PHOTOPATH);
 
+        LOGGER.info("This is the sample date: " + task.getTaskRevealedDate().getTime());
+        
         PreparedStatement stmt = null;
         try {
 
             stmt = mySqlClient.getPreparedStatement(insert);
-            stmt.setString(1, task.getId().toString());
-            stmt.setString(2, task.getTitle());
-            stmt.setLong(3, task.getRevealedDate().getTime());
-            stmt.setInt(4, task.isDeferred() ? 1 : 0);
-            stmt.setInt(5, task.isRealized() ? 1 : 0);
+            stmt.setString(1, task.getTaskID().toString());
+            stmt.setString(2, task.getTaskTitle());
+            stmt.setLong(3, task.getTaskRevealedDate().getTime());
+            stmt.setInt(4, task.getTaskDeferred() ? 1 : 0);
+            stmt.setInt(5, task.getTaskRealized() ? 1 : 0);
             stmt.setString(6, task.getPhotoFilePath());
 
             stmt.executeUpdate();
@@ -178,6 +188,9 @@ public class TaskCursor implements ITaskCursor {
         }
 
         LOGGER.info("Task added to the database...");
+        
+        Task returnTask = getTask(uuid);
+        return returnTask;
     }
 
 
@@ -185,16 +198,21 @@ public class TaskCursor implements ITaskCursor {
     *
     * @param task the Task that gets deleted
     */
-    public void deleteTask(Task task) {
-        LOGGER.info("Deleteing Task with uuid: " + task.getId().toString());
+    public void deleteTask(String uuid) {
+        LOGGER.info("Deleteing Task with uuid: " + uuid);
 
         String delete = StringUtils.applyFormat(
             "DELETE FROM {0} WHERE task_uuid = \"{1}\"",
             TaskTable.NAME,
-            task.getId().toString());
+            uuid);
 
-        mySqlClient.updateDatabaseStatement(delete);
-
+        int rows = mySqlClient.updateDatabaseStatement(delete);
+        
+        if (rows == 0) {
+        	LOGGER.severe("Delete task failed for task " + uuid);
+        	throw new NotFoundException("task: "+ uuid +" was not found, delete task failed.");
+        }
+        
         LOGGER.info("Task deleted from the database...");
     }
 
@@ -202,9 +220,11 @@ public class TaskCursor implements ITaskCursor {
     *
     * @param task the Task that gets updated
     */
-    public void updateTask(Task task) {
-        LOGGER.info("Updating Task with uuid: " + task.getId().toString());
+    public Task updateTask(Task task) {
+    	String uuid = task.getTaskID().toString();
+        LOGGER.info("Updating Task with uuid: " + uuid);
 
+        int rows = 0;
         String insert = StringUtils.applyFormat(
             "UPDATE {0} "
                 + "SET {1}=?, {2}=?, {3}=?, {4}=? "
@@ -217,17 +237,17 @@ public class TaskCursor implements ITaskCursor {
             TaskTable.Cols.UUID);
 
         LOGGER.info(insert);
-
+        
         PreparedStatement stmt = null;
         try {
             stmt = mySqlClient.getPreparedStatement(insert);
-            stmt.setString(1, task.getTitle());
-            stmt.setInt(2, task.isDeferred() ? 1 : 0);
-            stmt.setInt(3, task.isRealized() ? 1 : 0);
+            stmt.setString(1, task.getTaskTitle());
+            stmt.setInt(2, task.getTaskDeferred() ? 1 : 0);
+            stmt.setInt(3, task.getTaskRealized() ? 1 : 0);
             stmt.setString(4, task.getPhotoFilePath());
-            stmt.setString(5, task.getId().toString());
+            stmt.setString(5, uuid);
 
-            stmt.executeUpdate();
+            rows = stmt.executeUpdate();
         }
         catch (SQLException se) {
             LOGGER.warning(se.toString());
@@ -235,7 +255,15 @@ public class TaskCursor implements ITaskCursor {
         finally {
             mySqlClient.closeStatementResultSet(stmt, null);
         }
+        
+        if (rows == 0) {
+        	LOGGER.severe("Update task failed for task " + uuid);
+        	throw new NotFoundException("task: "+ uuid +" was not found, update task failed.");
+        }
 
         LOGGER.info("Task updated in database...");
+        
+        Task updated = getTask(task.getTaskID().toString());
+        return updated;
     }
 }

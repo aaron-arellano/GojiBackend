@@ -37,7 +37,6 @@ public class TaskEntryCursorTest {
     private TaskDbHelper taskDbHelper;
     private DatabaseConfigWrapper wrapper;
 
-    @SuppressWarnings("javadoc")
     @Before
     public void setUp() throws Exception {
         this.wrapper = TestDatabaseConfigLoader.createTestDbConfig();
@@ -49,7 +48,6 @@ public class TaskEntryCursorTest {
         this.taskDbHelper.createDbTable();
     }
 
-    @SuppressWarnings("javadoc")
     @After
     public void tearDown() throws Exception {
         // drop the tables after done testing
@@ -62,7 +60,6 @@ public class TaskEntryCursorTest {
     }
 
 
-    @SuppressWarnings("javadoc")
     @Test
     public void addTaskEntryTest() {
 
@@ -117,7 +114,6 @@ public class TaskEntryCursorTest {
         }
     }
 
-    @SuppressWarnings("javadoc")
     @Test
     public void updateTaskEntryTextTest() {
 
@@ -166,7 +162,6 @@ public class TaskEntryCursorTest {
         }
     }
 
-    @SuppressWarnings("javadoc")
     @Test
     public void getTaskEntriesTest() {
 
@@ -199,11 +194,11 @@ public class TaskEntryCursorTest {
 
     private Task addTaskToDb() {
         Task task = new Task();
-        task.setTitle("example");
-        task.setRevealedDate(new Date());
-        task.setDeferred(true);
-        task.setRealized(false);
-        task.setTaskEntries(null);
+        task.setTaskTitle("example");
+        task.setTaskRevealedDate(new Date());
+        task.setTaskDeferred(true);
+        task.setTaskRealized(false);
+        //task.setTaskEntries(null);
         task.setPhotoFilePath("C:\\temp\\photo.jpg");
 
         String insert = StringUtils.applyFormat(
@@ -220,11 +215,11 @@ public class TaskEntryCursorTest {
         try {
 
             stmt = mySqlClient.getPreparedStatement(insert);
-            stmt.setString(1, task.getId().toString());
-            stmt.setString(2, task.getTitle());
-            stmt.setLong(3, task.getRevealedDate().getTime());
-            stmt.setInt(4, task.isDeferred() ? 1 : 0);
-            stmt.setInt(5, task.isRealized() ? 1 : 0);
+            stmt.setString(1, task.getTaskID().toString());
+            stmt.setString(2, task.getTaskTitle());
+            stmt.setLong(3, task.getTaskRevealedDate().getTime());
+            stmt.setInt(4, task.getTaskDeferred() ? 1 : 0);
+            stmt.setInt(5, task.getTaskRealized() ? 1 : 0);
             stmt.setString(6, task.getPhotoFilePath());
 
             stmt.executeUpdate();

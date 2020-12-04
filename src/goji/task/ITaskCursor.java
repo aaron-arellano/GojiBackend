@@ -9,16 +9,14 @@ import java.util.List;
 */
 public interface ITaskCursor {
 
-    @SuppressWarnings("javadoc")
     Task getTask(String uuid);
 
-    @SuppressWarnings("javadoc")
     List<Task> getTasks();
 
-    @SuppressWarnings("javadoc")
-    void addTask(Task task);
+    Task addTask(Task task);
 
-    @SuppressWarnings("javadoc")
-    void deleteTask(Task task);
+    void deleteTask(String uuid);
+    
+    Task updateTask(Task task);
 
 }

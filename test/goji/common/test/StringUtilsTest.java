@@ -1,8 +1,8 @@
 package goji.common.test;
 
 import static org.junit.Assert.*;
-import goji.common.utils.StringUtils;
 import org.junit.Test;
+import goji.common.utils.StringUtils;
 
 /** Tests String utility methods
  *
@@ -11,7 +11,6 @@ import org.junit.Test;
  */
 public class StringUtilsTest {
 
-    @SuppressWarnings("javadoc")
     @Test
     public void isNullOrEmptyTest() {
         String test1 = null;
@@ -24,7 +23,6 @@ public class StringUtilsTest {
         assertFalse(StringUtils.isNullOrEmpty(test3));
     }
 
-    @SuppressWarnings("javadoc")
     @Test
     public void applyFormatTest() {
         String s = "This is the arg {0} I want to apply a {1} to.. {2} {ignore} {a} {a1}";

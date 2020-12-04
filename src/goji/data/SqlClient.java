@@ -42,13 +42,14 @@ public abstract class SqlClient {
      *
      * @param stringStatement the input SQL statement to execute
      */
-    public void updateDatabaseStatement(String stringStatement) {
+    public int updateDatabaseStatement(String stringStatement) {
        Statement stmt = null;
+       int rows = 0;
        try {
 
            LOGGER.info("Update statement: " + stringStatement);
            stmt = conn.createStatement();
-           stmt.executeUpdate(stringStatement);
+           rows = stmt.executeUpdate(stringStatement);
        }
        catch(SQLException se) {
            LOGGER.warning(se.toString());
@@ -59,7 +60,9 @@ public abstract class SqlClient {
        finally {
            ConnectionOperations.closeDbConnections(null, stmt, null);
        }
+       
        LOGGER.info("Database successfully updated...");
+       return rows;
    }
 
    /** Public method to query SQL database. Classes that use this method must close the db
