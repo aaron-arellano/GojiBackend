@@ -14,6 +14,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 import java.util.logging.Logger;
 import org.junit.After;
 import org.junit.Before;
@@ -60,7 +61,7 @@ public class TaskCursorTest {
 
         taskCursor.addTask(task);
 
-        Task actualTask = taskCursor.getTask(task.getTaskID().toString());
+        Task actualTask = taskCursor.getTask(task.getTaskID());
 
         assertEquals(task.getTaskID(), actualTask.getTaskID());
         assertEquals(task.getTaskTitle(), actualTask.getTaskTitle());
@@ -104,7 +105,7 @@ public class TaskCursorTest {
     public void addTaskTest() {
         Task task = createTask();
 
-        String taskId = task.getTaskID().toString();
+        String taskId = task.getTaskID();
 
         taskCursor.addTask(task);
 
@@ -152,7 +153,7 @@ public class TaskCursorTest {
             LOGGER.warning(se.toString());
         }
 
-        taskCursor.deleteTask(task.getTaskID().toString());
+        taskCursor.deleteTask(task.getTaskID());
         result = mySqlClient.queryDatabaseStatement(query);
         try {
 
@@ -174,7 +175,7 @@ public class TaskCursorTest {
 
         taskCursor.addTask(task);
 
-        Task getTask = taskCursor.getTask(task.getTaskID().toString());
+        Task getTask = taskCursor.getTask(task.getTaskID());
 
         assertEquals(task.getTaskID(), getTask.getTaskID());
         assertEquals(task.getTaskTitle(), getTask.getTaskTitle());
@@ -199,7 +200,7 @@ public class TaskCursorTest {
     }
 
     private Task createTask() {
-        Task task = new Task();
+        Task task = new Task(UUID.randomUUID());
         task.setTaskTitle("Adding a Task test");
         task.setTaskRevealedDate(new Date());
         task.setTaskDeferred(true);

@@ -22,6 +22,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 import java.util.logging.Logger;
 
 /** Test class to ensure non-regression of TaskEntryCursor DAO methods
@@ -193,7 +194,7 @@ public class TaskEntryCursorTest {
     }
 
     private Task addTaskToDb() {
-        Task task = new Task();
+        Task task = new Task(UUID.randomUUID());
         task.setTaskTitle("example");
         task.setTaskRevealedDate(new Date());
         task.setTaskDeferred(true);
@@ -215,7 +216,7 @@ public class TaskEntryCursorTest {
         try {
 
             stmt = mySqlClient.getPreparedStatement(insert);
-            stmt.setString(1, task.getTaskID().toString());
+            stmt.setString(1, task.getTaskID());
             stmt.setString(2, task.getTaskTitle());
             stmt.setLong(3, task.getTaskRevealedDate().getTime());
             stmt.setInt(4, task.getTaskDeferred() ? 1 : 0);
