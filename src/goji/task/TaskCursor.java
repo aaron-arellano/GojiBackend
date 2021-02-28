@@ -152,7 +152,7 @@ public class TaskCursor implements ITaskCursor {
     * @param task the new Task that gets added
     */
     public Task addTask(Task task) {
-    	String uuid = task.getTaskID().toString();
+    	String uuid = task.getTaskID();
         LOGGER.info("Adding Task with uuid: " + uuid);
 
         String insert = StringUtils.applyFormat(
@@ -221,7 +221,7 @@ public class TaskCursor implements ITaskCursor {
     * @param task the Task that gets updated
     */
     public Task updateTask(Task task) {
-    	String uuid = task.getTaskID().toString();
+    	String uuid = task.getTaskID();
         LOGGER.info("Updating Task with uuid: " + uuid);
 
         int rows = 0;

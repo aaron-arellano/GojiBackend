@@ -13,7 +13,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 public class Task {
 
 	@JsonProperty()
-    private UUID taskID;
+    private String taskID;
 	@JsonProperty()
     private String taskTitle;
 	@JsonProperty()
@@ -24,14 +24,12 @@ public class Task {
     private boolean taskDeferred;
 	@JsonProperty()
     private String photoFilePath;
-    //private List<TaskEntry> taskEntries;
 
-    /** Create a new Task object.
+
+    /** Create a new Task object. Check in place for REST call
      *
      */
-    public Task() {
-        this(UUID.randomUUID());
-    }
+    public Task() {}
 
     /** Create a new Task object and sets the uuid of the Task. Primarily
      *  used when creating a Task that already exists in the Db.
@@ -39,11 +37,15 @@ public class Task {
      * @param taskID the unique ID of the Task
      */
     public Task(UUID taskID) {
-        this.taskID = taskID;
+        this.taskID = taskID.toString();
     }
 
-    public UUID getTaskID() {
+    public String getTaskID() {
         return taskID;
+    }
+    
+    public void setTaskID(String taskID) {
+        this.taskID = taskID;
     }
 
     public String getTaskTitle() {
@@ -118,50 +120,4 @@ public class Task {
         TaskEntry entry = new TaskEntry("Task Deferred", new Date(), TaskEntryKind.DEFERRED);
         //taskEntries.add(entry);
     }
-
-    /** Method to update task entry comments
-     *
-     * @param comment updated comment to add to the TaskEntry
-     * @param uuid unique ID used to find the TaskEntry
-     */
-    /*public void updateEntryComment(String comment, String uuid) {
-        int pos = 0;
-        for (TaskEntry entry : taskEntries) {
-            if (entry.getTaskEntryID().toString().equals(uuid)) {
-                break;
-            }
-            pos++;
-        }
-        TaskEntry entry = taskEntries.get(pos);
-        // update the database entry here
-
-        entry.setEntryText(comment);
-        taskEntries.set(pos, entry);
-    }*/
-
-    /** Removes realized entry from a TaskEntry
-    *
-    */
-    /*public void removeTaskRealized() {
-        Iterator<TaskEntry> iterator = taskEntries.iterator();
-        while (iterator.hasNext()) {
-            TaskEntry e = iterator.next();
-            if (e.getTaskEntryKind() == TaskEntryKind.REALIZED) {
-                iterator.remove();
-            }
-        }
-    }*/
-
-    /** Removes deferred entry from a TaskEntry
-    *
-    */
-    /*public void removeTaskDeferred() {
-        Iterator<TaskEntry> iterator = taskEntries.iterator();
-        while (iterator.hasNext()) {
-            TaskEntry e = iterator.next();
-            if (e.getTaskEntryKind() == TaskEntryKind.DEFERRED) {
-                iterator.remove();
-            }
-        }
-    }*/
 }

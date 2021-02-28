@@ -60,17 +60,30 @@ public class TaskController {
 	@PUT
     @Produces({MediaType.APPLICATION_JSON})
 	@Consumes({MediaType.APPLICATION_JSON})
-    public Response addTask(Task task) {
+    public Response addUpdateTask(Task task) {
 		ObjectUtils.validateObjectNotNull(task);
-		
 		ITaskCursor cursor = getTaskCursor();
-		String uuid = task.getTaskID().toString();
-		task.setTaskRevealedDate(new Date());
+		String taskId = "";
+		String result = "";
+
+		if (task.getTaskID() != null) {
+			taskId = task.getTaskID();
+			ObjectUtils.validUuid(taskId);
+			LOGGER.info("Start update task for user: " + taskId);
+			Task updatedTask = cursor.updateTask(task);
+			result = JsonObjectMapper.objectToJsonString(updatedTask);
+			LOGGER.info("Stop update task for user: " + taskId);
+		}
+		else {
+			taskId = UUID.randomUUID().toString();
+			task.setTaskID(taskId);
+			task.setTaskRevealedDate(new Date());
 		
-		LOGGER.info("Start add task for user: " + uuid);
-		Task addedTask = cursor.addTask(task);
-		String result = JsonObjectMapper.objectToJsonString(addedTask);
-		LOGGER.info("Stop add task for user: " + uuid);
+			LOGGER.info("Start add task for user: " + taskId);
+			Task addedTask = cursor.addTask(task);
+			result = JsonObjectMapper.objectToJsonString(addedTask);
+			LOGGER.info("Stop add task for user: " + taskId);
+		}
 		
 		return Response.ok(result, MediaType.APPLICATION_JSON).build();
     }
@@ -89,25 +102,6 @@ public class TaskController {
 		
         return Response.ok().build();
     }
-	
-	@PUT
-	@Path(ApiConstants.TASK_PATH)
-    @Produces({MediaType.APPLICATION_JSON})
-	@Consumes({MediaType.APPLICATION_JSON})
-    public Response updateTask(@PathParam("taskId") String taskId, Task task) {
-		ObjectUtils.validUuid(taskId);
-		ObjectUtils.validateObjectNotNull(task);
-		
-		ITaskCursor cursor = getTaskCursor();
-		Task taskWrapper = wrapTask(taskId, task);
-		
-		LOGGER.info("Start update task for user: " + taskId);
-		Task updatedTask = cursor.updateTask(taskWrapper);
-		String result = JsonObjectMapper.objectToJsonString(updatedTask);
-		LOGGER.info("Stop update task for user: " + taskId);
-		
-		return Response.ok(result, MediaType.APPLICATION_JSON).build();
-    }
 		
 	private ITaskCursor getTaskCursor() {
 		AgentUtils agentUtils = new AgentUtils();
@@ -116,14 +110,5 @@ public class TaskController {
 		
 		return cursor;
 	}
-	
-	private Task wrapTask(String uuid, Task task) {
-		Task ans = new Task(UUID.fromString(uuid));
-		ans.setTaskTitle(task.getTaskTitle());
-		ans.setTaskRealized(task.getTaskRealized());
-		ans.setTaskDeferred(task.getTaskDeferred());
-		ans.setPhotoFilePath(task.getPhotoFilePath());
-		
-		return ans;
-	}
+
 }
